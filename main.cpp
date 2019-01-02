@@ -38,7 +38,6 @@
 
 namespace {
 
-
 /**
 * \brief This function show a help message
 */
