@@ -139,17 +139,26 @@ DisplayParams prepareDisplayParams(size_t count) {
     return params;
 }
 
+// cv::resize interpolation options
+//		INTER_NEAREST
+//		INTER_LINEAR
+//		INTER_AREA
+//		INTER_CUBIC
+//		INTER_LANCZOS4
 void displayNSources(const std::vector<std::shared_ptr<VideoFrame>>& data,
                      float time,
                      const std::string& stats,
                      DisplayParams params) {
-    cv::Mat windowImage = cv::Mat::zeros(params.windowSize, CV_8UC3);
+    cv::Mat windowImage = cv::Mat::zeros(params.windowSize, CV_8UC3); // CV_8UC3: 8bit unsigned integer 3-channels
     auto loopBody = [&](size_t i) {
         auto& elem = data[i];
         if (!elem->frame.empty()) {
             cv::Rect rectFrame = cv::Rect(params.points[i], params.frameSize);
             cv::Mat windowPart = windowImage(rectFrame);
-            cv::resize(elem->frame, windowPart, params.frameSize);
+			if (i % 2 == 0)
+	            cv::resize(elem->frame, windowPart, params.frameSize, 0, 0, 0); // use resize interpolation options
+			else
+				cv::resize(elem->frame, windowPart, params.frameSize, 0, 0, 4);
             drawDetections(windowPart, elem->detections);
         }
     };
